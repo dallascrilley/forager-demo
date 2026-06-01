@@ -1,0 +1,366 @@
+[
+   {
+      "id": "thread_001",
+      "channel": "#engineering",
+      "title": "Stripe Connect refund flow",
+      "messages": [
+         {
+            "id": "m1",
+            "author": "alex",
+            "text": "How do we handle refunds for Stripe Connect accounts? The docs say something about reverse transfers but I'm not clear on the timing.",
+            "timestamp": "2026-05-15T09:00:00Z",
+            "reactions": [
+               "question"
+            ]
+         },
+         {
+            "id": "m2",
+            "author": "sam",
+            "text": "You need to create a Refund object on the PaymentIntent first, then reverse the transfer separately. The transfer reversal can take 5-7 business days.",
+            "timestamp": "2026-05-15T09:15:00Z",
+            "reactions": [
+               "lightbulb",
+               "plus_one"
+            ]
+         },
+         {
+            "id": "m3",
+            "author": "alex",
+            "text": "Got it, thanks! That cleared it up.",
+            "timestamp": "2026-05-15T09:20:00Z",
+            "reactions": [
+               "check"
+            ]
+         }
+      ],
+      "resolved": true
+   },
+   {
+      "id": "thread_002",
+      "channel": "#engineering",
+      "title": "Database connection pooling",
+      "messages": [
+         {
+            "id": "m4",
+            "author": "jordan",
+            "text": "What's our recommended connection pool size for Postgres? We keep hitting max connections in staging.",
+            "timestamp": "2026-05-14T14:00:00Z",
+            "reactions": [
+               "question"
+            ]
+         },
+         {
+            "id": "m5",
+            "author": "taylor",
+            "text": "We use PgBouncer in transaction mode with a pool of 25 per app instance. Max connections on the DB is 200. If you're still hitting limits, check for connection leaks in your async code.",
+            "timestamp": "2026-05-14T14:10:00Z",
+            "reactions": [
+               "lightbulb",
+               "plus_one",
+               "plus_one"
+            ]
+         },
+         {
+            "id": "m6",
+            "author": "jordan",
+            "text": "Found the leak — we weren't closing connections in the error path. Fixed now.",
+            "timestamp": "2026-05-14T14:30:00Z",
+            "reactions": [
+               "check",
+               "fire"
+            ]
+         }
+      ],
+      "resolved": true
+   },
+   {
+      "id": "thread_003",
+      "channel": "#engineering",
+      "title": "API rate limiting headers",
+      "messages": [
+         {
+            "id": "m7",
+            "author": "casey",
+            "text": "Does our API return Retry-After headers when rate limited? I'm getting 429s with no guidance.",
+            "timestamp": "2026-05-13T11:00:00Z",
+            "reactions": [
+               "question"
+            ]
+         },
+         {
+            "id": "m8",
+            "author": "morgan",
+            "text": "Yes — X-RateLimit-Reset and Retry-After are both returned. If you're not seeing them, you might be hitting the WAF limit before the app limit. Check the response headers carefully; WAF responses look different.",
+            "timestamp": "2026-05-13T11:05:00Z",
+            "reactions": [
+               "lightbulb"
+            ]
+         },
+         {
+            "id": "m9",
+            "author": "casey",
+            "text": "Ah that was it — WAF limit. Thanks Morgan.",
+            "timestamp": "2026-05-13T11:08:00Z",
+            "reactions": [
+               "check"
+            ]
+         }
+      ],
+      "resolved": true
+   },
+   {
+      "id": "thread_004",
+      "channel": "#engineering",
+      "title": "Docker build caching",
+      "messages": [
+         {
+            "id": "m10",
+            "author": "riley",
+            "text": "Our Docker builds are taking 8 minutes every time. Any tips for improving layer caching?",
+            "timestamp": "2026-05-12T16:00:00Z",
+            "reactions": [
+               "question"
+            ]
+         },
+         {
+            "id": "m11",
+            "author": "quinn",
+            "text": "Put your dependency installation (requirements.txt, package.json) before your source copy. Also use BuildKit mount caches for apt and pip.",
+            "timestamp": "2026-05-12T16:05:00Z",
+            "reactions": [
+               "lightbulb",
+               "plus_one"
+            ]
+         },
+         {
+            "id": "m12",
+            "author": "riley",
+            "text": "BuildKit mount cache cut it to 2 minutes. Huge win.",
+            "timestamp": "2026-05-12T16:20:00Z",
+            "reactions": [
+               "check",
+               "fire",
+               "fire"
+            ]
+         }
+      ],
+      "resolved": true
+   },
+   {
+      "id": "thread_005",
+      "channel": "#engineering",
+      "title": "Redis cluster failover",
+      "messages": [
+         {
+            "id": "m13",
+            "author": "drew",
+            "text": "What happens to in-flight requests when Redis cluster fails over? Do they get retried or dropped?",
+            "timestamp": "2026-05-11T10:00:00Z",
+            "reactions": [
+               "question"
+            ]
+         },
+         {
+            "id": "m14",
+            "author": "blake",
+            "text": "Dropped by default. We wrap Redis calls in a 3-retry loop with 100ms backoff. For critical paths, use a circuit breaker that falls back to DB reads.",
+            "timestamp": "2026-05-11T10:08:00Z",
+            "reactions": [
+               "lightbulb",
+               "plus_one"
+            ]
+         },
+         {
+            "id": "m15",
+            "author": "drew",
+            "text": "Good call on the circuit breaker. Adding that now.",
+            "timestamp": "2026-05-11T10:15:00Z",
+            "reactions": [
+               "check"
+            ]
+         }
+      ],
+      "resolved": true
+   },
+   {
+      "id": "thread_006",
+      "channel": "#engineering",
+      "title": "TypeScript strict mode migration",
+      "messages": [
+         {
+            "id": "m16",
+            "author": "jules",
+            "text": "Anyone done a strict mode migration on a large TS codebase? We have 400+ errors after flipping the switch.",
+            "timestamp": "2026-05-10T13:00:00Z",
+            "reactions": [
+               "question"
+            ]
+         },
+         {
+            "id": "m17",
+            "author": "avery",
+            "text": "Don't fix them all at once. Use tsconfig's incremental strict flags — noImplicitAny first, then strictNullChecks. We did it over 3 sprints and it was manageable.",
+            "timestamp": "2026-05-10T13:10:00Z",
+            "reactions": [
+               "lightbulb",
+               "plus_one",
+               "plus_one"
+            ]
+         },
+         {
+            "id": "m18",
+            "author": "jules",
+            "text": "Smart approach. Starting with noImplicitAny this sprint.",
+            "timestamp": "2026-05-10T13:15:00Z",
+            "reactions": [
+               "check"
+            ]
+         }
+      ],
+      "resolved": true
+   },
+   {
+      "id": "thread_007",
+      "channel": "#product",
+      "title": "Feature flag rollout strategy",
+      "messages": [
+         {
+            "id": "m19",
+            "author": "kris",
+            "text": "What's our standard rollout strategy for new features? Do we do percentage-based or user-segment based?",
+            "timestamp": "2026-05-09T09:00:00Z",
+            "reactions": [
+               "question"
+            ]
+         },
+         {
+            "id": "m20",
+            "author": "dakota",
+            "text": "Internal team first (dogfood), then 5% of paying customers, then 25%, then GA. We use LaunchDarkly for the gating. Always have a kill switch ready.",
+            "timestamp": "2026-05-09T09:08:00Z",
+            "reactions": [
+               "lightbulb",
+               "plus_one"
+            ]
+         },
+         {
+            "id": "m21",
+            "author": "kris",
+            "text": "Kill switch is key. Thanks Dakota.",
+            "timestamp": "2026-05-09T09:12:00Z",
+            "reactions": [
+               "check"
+            ]
+         }
+      ],
+      "resolved": true
+   },
+   {
+      "id": "thread_008",
+      "channel": "#product",
+      "title": "A/B test duration calculator",
+      "messages": [
+         {
+            "id": "m22",
+            "author": "skyler",
+            "text": "How long should we run A/B tests? Is there a formula we use?",
+            "timestamp": "2026-05-08T11:00:00Z",
+            "reactions": [
+               "question"
+            ]
+         },
+         {
+            "id": "m23",
+            "author": "reese",
+            "text": "Minimum 2 weeks to account for weekly seasonality. We use a sample-size calculator with 80% power and 5% significance. If the uplift is < 2%, you need ~10k per variant.",
+            "timestamp": "2026-05-08T11:05:00Z",
+            "reactions": [
+               "lightbulb",
+               "plus_one"
+            ]
+         },
+         {
+            "id": "m24",
+            "author": "skyler",
+            "text": "10k per variant — noted. Thanks Reese.",
+            "timestamp": "2026-05-08T11:10:00Z",
+            "reactions": [
+               "check"
+            ]
+         }
+      ],
+      "resolved": true
+   },
+   {
+      "id": "thread_009",
+      "channel": "#engineering",
+      "title": "GitHub Actions self-hosted runners",
+      "messages": [
+         {
+            "id": "m25",
+            "author": "tatum",
+            "text": "Do we use self-hosted runners for anything? The public runners are timing out on our integration tests.",
+            "timestamp": "2026-05-07T15:00:00Z",
+            "reactions": [
+               "question"
+            ]
+         },
+         {
+            "id": "m26",
+            "author": "cameron",
+            "text": "Yes — we have 4 self-hosted runners on EC2 for the heavy integration suite. They're in the `heavy` runner group. Tag your workflow with `runs-on: self-hosted` and `group: heavy`.",
+            "timestamp": "2026-05-07T15:05:00Z",
+            "reactions": [
+               "lightbulb"
+            ]
+         },
+         {
+            "id": "m27",
+            "author": "tatum",
+            "text": "Perfect, will tag it. Thanks.",
+            "timestamp": "2026-05-07T15:08:00Z",
+            "reactions": [
+               "check"
+            ]
+         }
+      ],
+      "resolved": true
+   },
+   {
+      "id": "thread_010",
+      "channel": "#engineering",
+      "title": "WebSocket reconnection logic",
+      "messages": [
+         {
+            "id": "m28",
+            "author": "sage",
+            "text": "What's our pattern for WebSocket reconnection? Should we use exponential backoff or fixed interval?",
+            "timestamp": "2026-05-06T10:00:00Z",
+            "reactions": [
+               "question"
+            ]
+         },
+         {
+            "id": "m29",
+            "author": "hayden",
+            "text": "Exponential backoff with jitter, capped at 30s. After 5 failed reconnects, show a 'connection lost' UI state and let the user manually retry. Don't auto-reconnect forever — it burns battery and looks like the app is 'working' when it's not.",
+            "timestamp": "2026-05-06T10:08:00Z",
+            "reactions": [
+               "lightbulb",
+               "plus_one",
+               "plus_one"
+            ]
+         },
+         {
+            "id": "m30",
+            "author": "sage",
+            "text": "The cap and manual retry makes sense. Will implement.",
+            "timestamp": "2026-05-06T10:12:00Z",
+            "reactions": [
+               "check"
+            ]
+         }
+      ],
+      "resolved": true
+   }
+]

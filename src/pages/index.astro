@@ -1,0 +1,86 @@
+---
+// Forager — Slack threads → queryable knowledge
+import '../styles/forager.css';
+const title = "Forager — Your tribal knowledge is in Slack. Stop pretending the wiki has it.";
+const description = "Harvest resolved Slack threads into a queryable knowledge base with confidence scoring and MCP server simulation.";
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="robots" content="noindex" />
+    <meta name="robots" content="noindex, nofollow, noarchive" />
+  </head>
+  <body>
+    <div class="fg-root">
+      <nav class="fg-nav" aria-label="Forager navigation">
+        <span class="fg-logo">forager</span>
+        <span class="fg-nav-sep" aria-hidden="true"></span>
+        <span class="fg-nav-label">Internal Knowledge Harvester</span>
+        <span class="fg-nav-spacer"></span>
+        <span class="fg-nav-label" style="font-family:var(--fg-mono);font-size:11px;color:var(--fg-muted)">Synthetic data only</span>
+      </nav>
+
+      <div class="fg-banner" role="status">
+        <span class="fg-banner-icon" aria-hidden="true">◈</span>
+        <p class="fg-banner-text"><strong>Synthetic workspace only.</strong> These 10 Slack threads are fabricated, but the Q&A extraction logic, confidence scoring, and MCP response format are production-grade. <em>No real Slack data, no live API calls.</em></p>
+      </div>
+
+      <div class="fg-layout">
+        <aside class="fg-sidebar" aria-label="Thread explorer">
+          <div class="fg-sidebar-header">
+            <span class="fg-sidebar-title">Threads</span>
+            <button class="fg-btn-secondary" id="fg-harvest-btn">Re-harvest</button>
+          </div>
+          <div class="fg-thread-list" id="fg-thread-list" role="list" aria-label="Slack threads"></div>
+        </aside>
+
+        <main class="fg-main" role="main">
+          <section class="fg-query-section" aria-label="Knowledge query">
+            <h1 class="fg-query-heading">Ask the knowledge base</h1>
+            <div class="fg-query-bar">
+              <input
+                class="fg-query-input"
+                id="fg-query-input"
+                type="text"
+                placeholder="How do we handle Stripe Connect refunds?"
+                aria-label="Query"
+              />
+              <button class="fg-btn-primary" id="fg-query-btn">Query</button>
+            </div>
+            <div class="fg-query-results" id="fg-query-results"></div>
+          </section>
+
+          <section class="fg-kb-section" aria-label="Harvested knowledge">
+            <div class="fg-kb-header">
+              <span class="fg-kb-title">Harvested Q&A</span>
+              <div class="fg-stats" id="fg-stats"></div>
+            </div>
+            <div class="fg-kb-list" id="fg-kb-list"></div>
+          </section>
+        </main>
+
+        <aside class="fg-mcp" aria-label="MCP server panel">
+          <div class="fg-mcp-header">
+            <span class="fg-mcp-title">MCP Server</span>
+          </div>
+          <div class="fg-mcp-panel" id="fg-mcp-panel">
+            <div class="fg-mcp-placeholder">
+              Query the knowledge base to see the MCP response format.
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <div class="fg-detail-panel hidden" id="fg-detail-panel" aria-label="Thread detail"></div>
+    </div>
+    <script>import '../components/app.ts';</script>
+  </body>
+</html>
