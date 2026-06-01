@@ -1,37 +1,62 @@
 # Forager
 
+[![CI](https://github.com/dallascrilley/forager-demo/actions/workflows/ci.yml/badge.svg)](https://github.com/dallascrilley/forager-demo/actions/workflows/ci.yml)
+
 > **Your tribal knowledge is in Slack. Stop pretending the wiki has it.**
 
-Forager is a client-side knowledge harvester that turns resolved Slack threads into a queryable Q&A base with confidence scoring. It demonstrates RAG pipeline design, social-signal-based confidence scoring, and MCP server response formatting — all without a backend.
+Forager turns resolved Slack threads into a queryable Q&A knowledge base with confidence scoring. It is a **hybrid proof**: a real backend ingests an actual Slack export you upload — grouping messages into threads, harvesting question/answer pairs, and scoring each by social signal — while live OAuth and semantic search are explicitly out of scope.
 
-**Live demo:** [demos.dallascrilley.com/forager](https://demos.dallascrilley.com/forager)
+**Live demo:** [demos.dallascrilley.com/forager](https://demos.dallascrilley.com/forager) — explore the synthetic sample, or upload a real Slack channel export and watch it get harvested server-side.
 
-## What it proves
+## Real vs. synthetic — the honest boundary
 
-- **RAG over unstructured conversations** — retrieval from Slack-style threads using keyword overlap scoring, not just vector similarity.
-- **Confidence scoring from social signals** — answer quality is derived from reactions (💡, 👍), resolution status, and confirmation language, not arbitrary assignment.
-- **MCP fluency** — the query panel simulates an MCP server response format, showing understanding of agent-tool contracts.
-- **Zero-backend architecture** — all parsing, scoring, and matching runs in vanilla TypeScript. No API keys, no data egress.
+| Capability | Source |
+|---|---|
+| Ingest a real Slack channel export (`ts`/`thread_ts`/`reactions`) | **Live** — server-side parsing of your uploaded JSON |
+| Thread grouping, Q&A harvesting, confidence scoring | **Live** — runs in the backend on real input |
+| Sample workspace (no upload) | Synthetic — `public/data/threads.json` |
+| Live Slack connection | Out of scope — no OAuth / Event API |
+| Semantic retrieval | Out of scope — matching is keyword-based, not embeddings |
+
+The synthetic sample lets a reviewer try it instantly; uploading a real export proves the ingestion and harvesting logic works on genuine workspace data.
+
+## The backend
+
+[`functions/forager/ingest.js`](functions/forager/ingest.js) is a **Cloudflare Pages Function** — `POST /forager/ingest`. It:
+
+- accepts **either** a raw Slack channel export (`[{ ts, text, thread_ts?, reactions?, user_profile? }]`) **or** the demo's normalized thread shape, and auto-detects which;
+- groups messages into threads by `thread_ts`, then harvests Q&A: detect questions, resolve each to its confirmed answer (reaction/thanks signal, or longest substantive reply), and **score confidence from social signal** — resolution status, 👍/🔥 reactions, confirmation language — capped at 0.98 because extracted knowledge is never certain;
+- is **stateless** — the request body is the only input; nothing is stored.
+
+```bash
+curl -X POST https://demos.dallascrilley.com/forager/ingest \
+  -H 'content-type: application/json' \
+  -d '{"raw":"[{\"ts\":\"1700000000.0001\",\"text\":\"How do we rotate DKIM keys?\"}]"}'
+```
+
+The ingestion and scoring logic are pure functions, exported and unit-tested in [`tests/ingest.test.js`](tests/ingest.test.js).
 
 ## Run locally
 
 ```bash
 pnpm install
-pnpm dev
+pnpm test                                    # unit tests for harvesting + scoring
+pnpm dev                                     # static UI only — http://localhost:4321 (synthetic sample)
+pnpm build && npx wrangler pages dev dist    # UI + live /forager/ingest — http://localhost:8788
 ```
 
-Open `http://localhost:4321`. The demo loads 10 synthetic Slack threads from `public/data/threads.json`.
+Uploads reach the backend only under `wrangler pages dev` (port **8788**); `pnpm dev` (port 4321) serves the synthetic UI alone.
+
+## What it proves
+
+- **Knowledge-extraction pipeline design** — question detection → answer resolution → confidence scoring, on real Slack-export structure.
+- **Defensive ingestion** — two input shapes auto-detected, malformed input rejected with clear errors.
+- **Confidence from evidence, not vibes** — scores derive from reactions and resolution signals and never reach certainty.
+- **Honest system boundaries** — the live/synthetic and "no OAuth, no embeddings" lines are explicit in the UI, the API response (`source`, `inputFormat`), and this README.
 
 ## Architecture
 
-See [ARCHITECTURE.md](./ARCHITECTURE.md) for design decisions, harvester logic, and tradeoffs.
-
-## Honest limits
-
-- **No real Slack connection** — synthetic threads only. No OAuth, no live API.
-- **No vector embeddings** — matching is keyword-based, not semantic.
-- **No persistent storage** — knowledge base is in-memory only.
-- **No real MCP server** — the response panel simulates JSON format; no stdio or SSE transport.
+See [ARCHITECTURE.md](./ARCHITECTURE.md) for the data model, harvester pipeline, scoring formula, backend design, and tradeoffs.
 
 ## License
 

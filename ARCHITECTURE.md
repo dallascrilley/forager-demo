@@ -4,7 +4,19 @@
 
 - **Astro 5** — static site generator
 - **TypeScript** — vanilla TS, no framework; the UI is a three-panel dashboard
-- **No backend, no API keys, no environment variables**
+- **Cloudflare Pages Function** — one serverless endpoint for real Slack-export ingestion
+- **No API keys, no environment variables, no stored state** — uploads are processed in-request and discarded
+
+## Live backend
+
+`functions/forager/ingest.js` handles `POST /forager/ingest` and runs the harvest pipeline server-side on data you upload:
+
+1. **Auto-detect input shape** — a raw Slack channel export (`[{ ts, text, thread_ts?, reactions?, user_profile? }]`) or the demo's normalized thread array. Malformed input is rejected with a specific error.
+2. **Group into threads** by `thread_ts` (falling back to `ts`), normalizing authors, timestamps, and reaction names.
+3. **Harvest Q&A** with `harvestQA()` (below) and **score confidence** from social signal.
+4. **Return** threads, Q&A entries, and stats with `source: "uploaded"` and the detected `inputFormat`.
+
+The pipeline is stateless and identical whether the input is the synthetic sample or a real uploaded export — the sample is just the zero-friction path. Pure helpers (`parsePayload`, `harvestQA`, `scoreConfidence`, …) are exported and unit-tested in `tests/ingest.test.js`.
 
 ## Data model
 
@@ -101,18 +113,21 @@ This is not a real MCP server (no stdio transport, no `list_tools` handshake), b
 | `src/components/types.ts` | Shared TypeScript interfaces |
 | `src/styles/forager.css` | All styles — dark theme, three-panel grid, responsive breakpoints |
 
-## What was cut for scope
+## What is live vs. cut for scope
 
-- **Real Slack OAuth** — no live workspace connection
-- **Vector embeddings** — keyword only
-- **Persistent storage** — in-memory only
-- **Real MCP transport** — JSON simulation only
-- **Multi-workspace support** — single synthetic workspace
+**Live:** ingestion and harvesting run server-side on real uploaded Slack exports (see [Live backend](#live-backend)).
+
+Cut for scope:
+- **Real Slack OAuth** — ingest works on exports, but there is no live workspace connection / Event API
+- **Vector embeddings** — keyword matching only (see below)
+- **Persistent storage** — each request is independent; nothing is stored
+- **Real MCP transport** — JSON simulation only, no stdio/SSE handshake
+- **Multi-workspace support** — one export at a time
 
 ## How to extend to production
 
-A production version would need:
-1. Slack OAuth + Event API integration for live thread ingestion
+The upload path already proves ingestion + harvesting on real data. A production version would add:
+1. Slack OAuth + Event API for live, continuous thread ingestion
 2. Vector embedding layer (OpenAI, Cohere, or local) for semantic matching
 3. Persistent vector store (Pinecone, Weaviate, or pgvector) for cross-workspace search
 4. Real MCP server implementation with stdio or SSE transport
