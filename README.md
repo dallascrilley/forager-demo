@@ -41,11 +41,11 @@ The ingestion and scoring logic are pure functions, exported and unit-tested in 
 ```bash
 pnpm install
 pnpm test                                    # unit tests for harvesting + scoring
-pnpm dev                                     # static site only (synthetic sample)
-pnpm build && npx wrangler pages dev dist    # site + live /forager/ingest backend
+pnpm dev                                     # static UI only — http://localhost:4321 (synthetic sample)
+pnpm build && npx wrangler pages dev dist    # UI + live /forager/ingest — http://localhost:8788
 ```
 
-Open `http://localhost:4321` for the UI; uploads hit the function served by `wrangler pages dev`.
+Uploads reach the backend only under `wrangler pages dev` (port **8788**); `pnpm dev` (port 4321) serves the synthetic UI alone.
 
 ## What it proves
 
