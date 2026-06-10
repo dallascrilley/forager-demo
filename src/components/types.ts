@@ -28,3 +28,28 @@ export interface QueryResult {
   entry: QAEntry;
   score: number;
 }
+
+export interface KnowledgeStats {
+  threads: number;
+  resolvedThreads: number;
+  messages: number;
+  qaEntries: number;
+}
+
+export interface KnowledgeState {
+  source: 'synthetic' | 'uploaded';
+  sourceLabel: string;
+  sourceDetail: string;
+  threads: SlackThread[];
+  qa: QAEntry[];
+  stats: KnowledgeStats;
+}
+
+export interface UploadedKnowledgeResponse {
+  source: 'uploaded';
+  name: string;
+  inputFormat: 'canonical-threads' | 'slack-export-messages';
+  threads: SlackThread[];
+  qa: QAEntry[];
+  stats: KnowledgeStats;
+}

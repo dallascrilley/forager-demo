@@ -15,71 +15,112 @@ const description = "Harvest resolved Slack threads into a queryable knowledge b
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="robots" content="noindex" />
     <meta name="robots" content="noindex, nofollow, noarchive" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" />
   </head>
   <body>
-    <div class="fg-root">
-      <nav class="fg-nav" aria-label="Forager navigation">
-        <span class="fg-logo">forager</span>
-        <span class="fg-nav-sep" aria-hidden="true"></span>
-        <span class="fg-nav-label">Internal Knowledge Harvester</span>
-        <span class="fg-nav-spacer"></span>
-        <span class="fg-nav-label" style="font-family:var(--fg-mono);font-size:11px;color:var(--fg-muted)">Synthetic data only</span>
+    <div class="fr-root">
+      <nav class="fr-nav" aria-label="Forager navigation">
+        <span class="fr-logo">forager</span>
+        <span class="fr-nav-sep" aria-hidden="true"></span>
+        <span class="fr-nav-label">Internal Knowledge Harvester</span>
+        <span class="fr-nav-spacer"></span>
+        <span class="fr-nav-live">live backend</span>
+        <span class="fr-nav-label fr-mode-badge" id="fr-mode-badge">Synthetic sample mode</span>
       </nav>
 
-      <div class="fg-banner" role="status">
-        <span class="fg-banner-icon" aria-hidden="true">◈</span>
-        <p class="fg-banner-text"><strong>Synthetic workspace only.</strong> These 10 Slack threads are fabricated, but the Q&A extraction logic, confidence scoring, and MCP response format are production-grade. <em>No real Slack data, no live API calls.</em></p>
+      <div class="fr-banner" role="status">
+        <span class="fr-banner-icon" aria-hidden="true">◈</span>
+        <p class="fr-banner-text" id="fr-banner-copy"><strong>Synthetic workspace only.</strong> These 10 Slack threads are fabricated, but the Q&A extraction logic, confidence scoring, and MCP response format are production-grade. <em>No real Slack data, no live API calls.</em></p>
       </div>
 
-      <div class="fg-layout">
-        <aside class="fg-sidebar" aria-label="Thread explorer">
-          <div class="fg-sidebar-header">
-            <span class="fg-sidebar-title">Threads</span>
-            <button class="fg-btn-secondary" id="fg-harvest-btn">Re-harvest</button>
+      <!-- Hero: foreground the RAG→MCP knowledge-server angle above the fold -->
+      <section class="fr-hero" aria-label="What Forager does">
+        <div class="fr-hero-lead">
+          <h1 class="fr-hero-title">Your tribal knowledge is trapped in Slack threads.</h1>
+          <p class="fr-hero-sub">Forager harvests the resolved Q&amp;A out of Slack, scores each answer's confidence, and serves it as an <strong>MCP server your agents can query directly</strong> — not another wiki nobody updates.</p>
+        </div>
+        <div class="fr-hero-flow" aria-label="Pipeline: Slack export to MCP server">
+          <span class="fr-hero-step">Slack export</span>
+          <span class="fr-hero-arrow" aria-hidden="true">→</span>
+          <span class="fr-hero-step">Q&amp;A extraction</span>
+          <span class="fr-hero-arrow" aria-hidden="true">→</span>
+          <span class="fr-hero-step fr-hero-step-accent">MCP&nbsp;server</span>
+        </div>
+      </section>
+
+      <section class="fr-import-panel" aria-label="Upload Slack export">
+        <div class="fr-import-copy">
+          <div class="fr-import-title">Upload a real Slack export</div>
+          <p class="fr-import-body">Import a Slack channel export JSON file or paste normalized thread JSON. The backend groups messages into threads, extracts Q&A server-side, and swaps the UI from sample mode to your uploaded workspace.</p>
+        </div>
+        <div class="fr-import-controls">
+          <label class="fr-upload-field">
+            <span class="fr-upload-label">Slack export JSON</span>
+            <input class="fr-upload-input" id="fr-upload-file" type="file" accept="application/json,.json" />
+          </label>
+          <div class="fr-upload-or">or paste JSON</div>
+          <textarea class="fr-upload-text" id="fr-upload-text" rows="5" placeholder='[{"id":"thread_1","channel":"#engineering","messages":[...]}]'></textarea>
+          <div class="fr-import-actions">
+            <button class="fr-btn-primary" id="fr-import-btn" type="button">Import export</button>
+            <button class="fr-btn-secondary" id="fr-sample-btn" type="button">Use sample workspace</button>
           </div>
-          <div class="fg-thread-list" id="fg-thread-list" role="list" aria-label="Slack threads"></div>
+          <div class="fr-upload-status" id="fr-upload-status" aria-live="polite">Upload a Slack export JSON file or paste normalized thread JSON.</div>
+        </div>
+      </section>
+
+      <div class="fr-layout">
+        <aside class="fr-sidebar" aria-label="Thread explorer">
+          <div class="fr-sidebar-header">
+            <div>
+              <span class="fr-sidebar-title">Threads</span>
+              <div class="fr-source-chip"><span id="fr-source-title">Sample workspace</span><span id="fr-source-detail">10 fabricated Slack threads with realistic failure-and-resolution patterns.</span></div>
+            </div>
+            <button class="fr-btn-secondary" id="fr-harvest-btn">Re-run harvest</button>
+          </div>
+          <div class="fr-thread-list" id="fr-thread-list" role="list" aria-label="Slack threads"></div>
         </aside>
 
-        <main class="fg-main" role="main">
-          <section class="fg-query-section" aria-label="Knowledge query">
-            <h1 class="fg-query-heading">Ask the knowledge base</h1>
-            <div class="fg-query-bar">
+        <main class="fr-main" role="main">
+          <section class="fr-query-section" aria-label="Knowledge query">
+            <h1 class="fr-query-heading">Ask the knowledge base</h1>
+            <div class="fr-query-bar">
               <input
-                class="fg-query-input"
-                id="fg-query-input"
+                class="fr-query-input"
+                id="fr-query-input"
                 type="text"
                 placeholder="How do we handle Stripe Connect refunds?"
                 aria-label="Query"
               />
-              <button class="fg-btn-primary" id="fg-query-btn">Query</button>
+              <button class="fr-btn-primary" id="fr-query-btn">Query</button>
             </div>
-            <div class="fg-query-results" id="fg-query-results"></div>
+            <div class="fr-query-results" id="fr-query-results"></div>
           </section>
 
-          <section class="fg-kb-section" aria-label="Harvested knowledge">
-            <div class="fg-kb-header">
-              <span class="fg-kb-title">Harvested Q&A</span>
-              <div class="fg-stats" id="fg-stats"></div>
+          <section class="fr-kb-section" aria-label="Harvested knowledge">
+            <div class="fr-kb-header">
+              <span class="fr-kb-title">Harvested Q&A</span>
+              <div class="fr-stats" id="fr-stats"></div>
             </div>
-            <div class="fg-kb-list" id="fg-kb-list"></div>
+            <div class="fr-kb-list" id="fr-kb-list"></div>
           </section>
         </main>
 
-        <aside class="fg-mcp" aria-label="MCP server panel">
-          <div class="fg-mcp-header">
-            <span class="fg-mcp-title">MCP Server</span>
+        <aside class="fr-mcp" aria-label="MCP server panel">
+          <div class="fr-mcp-header">
+            <span class="fr-mcp-title">MCP Server</span>
           </div>
-          <div class="fg-mcp-panel" id="fg-mcp-panel">
-            <div class="fg-mcp-placeholder">
+          <div class="fr-mcp-panel" id="fr-mcp-panel">
+            <div class="fr-mcp-placeholder">
               Query the knowledge base to see the MCP response format.
             </div>
           </div>
         </aside>
       </div>
 
-      <div class="fg-detail-panel hidden" id="fg-detail-panel" aria-label="Thread detail"></div>
+      <div class="fr-detail-panel hidden" id="fr-detail-panel" aria-label="Thread detail"></div>
     </div>
     <script>import '../components/app.ts';</script>
   </body>

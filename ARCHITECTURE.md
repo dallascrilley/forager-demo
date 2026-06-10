@@ -106,12 +106,12 @@ This is not a real MCP server (no stdio transport, no `list_tools` handshake), b
 
 | File | Responsibility |
 |---|---|
-| `src/pages/index.astro` | Shell: nav, banner, three-panel layout |
-| `src/components/app.ts` | Bootstrap, thread list, KB list, query wiring, detail panel, MCP panel |
+| `src/pages/index.astro` | Shell: nav, banner, hero, upload/import panel, three-panel layout |
+| `src/components/app.ts` | Bootstrap, thread list, KB list, query wiring, detail panel, MCP panel, import/sample-mode controls |
 | `src/components/harvester.ts` | Q&A extraction, confidence scoring, query matching |
-| `src/components/store.ts` | Data loading singleton |
+| `src/components/store.ts` | Knowledge-state singleton — synthetic sample load + uploaded-export ingest via `POST /forager/ingest` |
 | `src/components/types.ts` | Shared TypeScript interfaces |
-| `src/styles/forager.css` | All styles — dark theme, three-panel grid, responsive breakpoints |
+| `src/styles/forager.css` | All styles — warm-archive light theme, three-panel grid, responsive breakpoints |
 
 ## What is live vs. cut for scope
 
