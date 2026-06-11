@@ -6,7 +6,7 @@
 
 Forager turns resolved Slack threads into a queryable Q&A knowledge base with confidence scoring. It is a **hybrid proof**: a real backend ingests an actual Slack export you upload — grouping messages into threads, harvesting question/answer pairs, and scoring each by social signal — while live OAuth and semantic search are explicitly out of scope.
 
-**Live demo:** [demos.dallascrilley.com/forager](https://demos.dallascrilley.com/forager) — explore the synthetic sample, or upload a real Slack channel export and watch it get harvested server-side.
+**Live demo:** [dallascrilley.com/demos/forager](https://dallascrilley.com/demos/forager) — explore the synthetic sample, or upload a real Slack channel export and watch it get harvested server-side.
 
 ## Real vs. synthetic — the honest boundary
 
@@ -29,7 +29,7 @@ The synthetic sample lets a reviewer try it instantly; uploading a real export p
 - is **stateless** — the request body is the only input; nothing is stored.
 
 ```bash
-curl -X POST https://demos.dallascrilley.com/forager/ingest \
+curl -X POST https://dallascrilley.com/demos/forager/ingest \
   -H 'content-type: application/json' \
   -d '{"raw":"[{\"ts\":\"1700000000.0001\",\"text\":\"How do we rotate DKIM keys?\"}]"}'
 ```
