@@ -1,6 +1,8 @@
 ---
 // Forager — Slack threads → queryable knowledge
 import '../styles/forager.css';
+import GuidedTour from '../components/demo/GuidedTour.astro';
+import { GUIDED_TOURS } from '../data/guidedTours';
 const title = "Forager — Your tribal knowledge is in Slack. Stop pretending the wiki has it.";
 const description = "Harvest resolved Slack threads into a queryable knowledge base with confidence scoring and MCP server simulation.";
 ---
@@ -35,6 +37,8 @@ const description = "Harvest resolved Slack threads into a queryable knowledge b
         <span class="fr-banner-icon" aria-hidden="true">◈</span>
         <p class="fr-banner-text" id="fr-banner-copy"><strong>Synthetic workspace only.</strong> These 10 Slack threads are fabricated, but the Q&A extraction logic, confidence scoring, and MCP response format are production-grade. <em>No real Slack data, no live API calls.</em></p>
       </div>
+
+      <GuidedTour {...GUIDED_TOURS.forager} />
 
       <!-- Hero: foreground the RAG→MCP knowledge-server angle above the fold -->
       <section class="fr-hero" aria-label="What Forager does">
