@@ -269,7 +269,7 @@ body {
 
 /* Small "filed under" label above the title */
 .fr-hero-lead::before {
-   content: 'KNOWLEDGE INDEX';
+   content: 'Overview';
    display: block;
    font-family: var(--fr-mono);
    font-size: 10px;
@@ -1326,3 +1326,13 @@ body {
       animation: none;
    }
 }
+
+.fr-empty-state {
+   padding: var(--fr-space-4);
+   border: 1px dashed color-mix(in oklch, var(--fr-ink) 18%, transparent);
+   border-radius: var(--fr-radius-sm);
+   color: var(--fr-muted);
+   font-size: 13px;
+   line-height: 1.45;
+}
+

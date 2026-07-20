@@ -29,7 +29,7 @@ const description = "Harvest resolved Slack threads into a queryable knowledge b
         <span class="fr-nav-sep" aria-hidden="true"></span>
         <span class="fr-nav-label">Internal Knowledge Harvester</span>
         <span class="fr-nav-spacer"></span>
-        <span class="fr-nav-live">live backend</span>
+        <span class="fr-nav-live">Uploads enabled</span>
         <span class="fr-nav-label fr-mode-badge" id="fr-mode-badge">Synthetic sample mode</span>
       </nav>
 
@@ -82,14 +82,14 @@ const description = "Harvest resolved Slack threads into a queryable knowledge b
               <span class="fr-sidebar-title">Threads</span>
               <div class="fr-source-chip"><span id="fr-source-title">Sample workspace</span><span id="fr-source-detail">10 fabricated Slack threads with realistic failure-and-resolution patterns.</span></div>
             </div>
-            <button class="fr-btn-secondary" id="fr-harvest-btn">Re-run harvest</button>
+            <button class="fr-btn-secondary" id="fr-harvest-btn">Refresh lists</button>
           </div>
           <div class="fr-thread-list" id="fr-thread-list" role="list" aria-label="Slack threads"></div>
         </aside>
 
         <main class="fr-main" role="main">
           <section class="fr-query-section" aria-label="Knowledge query">
-            <h1 class="fr-query-heading">Ask the knowledge base</h1>
+            <h2 class="fr-query-heading">Ask the knowledge base</h2>
             <div class="fr-query-bar">
               <input
                 class="fr-query-input"
