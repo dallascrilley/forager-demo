@@ -63,7 +63,7 @@ function updateModeBadge(state: KnowledgeState): void {
     banner.innerHTML =
       state.source === 'uploaded'
         ? '<strong>Uploaded workspace loaded.</strong> This session is now running against your own exported Slack data through a backend import endpoint. <em>No live Slack OAuth, but the threads and extracted answers are real.</em>'
-        : '<strong>Synthetic workspace only.</strong> These 10 Slack threads are fabricated, but the Q&A extraction logic, confidence scoring, and MCP response format are production-grade. <em>No real Slack data, no live API calls.</em>';
+        : '<strong>Synthetic workspace only.</strong> These 10 Slack threads are fabricated, but harvesting, confidence scoring, and the MCP preview use the same backend code as a real upload. <em>No real Slack data, no live API calls.</em>';
   }
   if (sourceTitle) sourceTitle.textContent = state.sourceLabel;
   if (sourceDetail) sourceDetail.textContent = state.sourceDetail;
