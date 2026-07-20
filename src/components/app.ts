@@ -29,6 +29,29 @@ function reactionEmoji(name: string): string {
 
 let currentState: KnowledgeState | null = null;
 
+function showLoadingState(message = 'Loading sample workspace…'): void {
+  const threadList = el('fr-thread-list');
+  const kbList = el('fr-kb-list');
+  const statsEl = el('fr-stats');
+  const uploadStatus = el('fr-upload-status');
+  if (threadList) threadList.innerHTML = `<div class="fr-empty-state">${escapeHtml(message)}</div>`;
+  if (kbList) kbList.innerHTML = `<div class="fr-empty-state">Harvested answers will appear here.</div>`;
+  if (statsEl) statsEl.innerHTML = '';
+  if (uploadStatus) {
+    uploadStatus.textContent = message;
+    uploadStatus.dataset.state = 'loading';
+  }
+}
+
+function showBootstrapError(message: string): void {
+  showLoadingState('Could not load the sample workspace.');
+  const uploadStatus = el('fr-upload-status');
+  if (uploadStatus) {
+    uploadStatus.textContent = message;
+    uploadStatus.dataset.state = 'error';
+  }
+}
+
 function updateModeBadge(state: KnowledgeState): void {
   const badge = el('fr-mode-badge');
   const banner = el('fr-banner-copy');
@@ -252,7 +275,19 @@ function wireQuery(): void {
 
   const runQuery = (): void => {
     const query = queryInput?.value.trim() || '';
-    if (!query || !currentState) return;
+    if (!currentState) return;
+    if (!query) {
+      renderQueryResults([], query);
+      const container = el('fr-query-results');
+      if (container) {
+        container.innerHTML = '<div class="fr-no-results">Type a question above, then press Query or Enter.</div>';
+      }
+      const mcpPanel = el('fr-mcp-panel');
+      if (mcpPanel) {
+        mcpPanel.innerHTML = '<div class="fr-mcp-placeholder">Run a query to preview the MCP response format.</div>';
+      }
+      return;
+    }
     const results = queryKnowledgeBase(query, currentState.qa);
     renderQueryResults(results, query);
     renderMCPResponse(results, query);
@@ -314,16 +349,28 @@ function wireModeControls(): void {
   reharvestBtn?.addEventListener('click', () => {
     if (!currentState || !uploadStatus) return;
     renderState(currentState);
-    uploadStatus.textContent = currentState.source === 'uploaded' ? 'Re-rendered the current uploaded workspace.' : 'Re-rendered the synthetic sample workspace.';
+    uploadStatus.textContent = currentState.source === 'uploaded' ? 'Refreshed the uploaded workspace lists.' : 'Refreshed the sample workspace lists.';
     uploadStatus.dataset.state = 'ok';
   });
 }
 
 async function init(): Promise<void> {
-  const state = await loadSyntheticState();
-  renderState(state);
+  showLoadingState();
   wireQuery();
   wireModeControls();
+  try {
+    const state = await loadSyntheticState();
+    renderState(state);
+    const uploadStatus = el('fr-upload-status');
+    if (uploadStatus && uploadStatus.dataset.state === 'loading') {
+      uploadStatus.textContent = 'Upload a Slack export JSON file or paste normalized thread JSON.';
+      delete uploadStatus.dataset.state;
+    }
+  } catch (error) {
+    showBootstrapError(error instanceof Error ? error.message : 'Could not load the sample workspace.');
+  }
 }
 
-init().catch(console.error);
+init().catch((error) => {
+  showBootstrapError(error instanceof Error ? error.message : 'Could not start Forager.');
+});
