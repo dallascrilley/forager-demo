@@ -35,23 +35,23 @@ const description = "Harvest resolved Slack threads into a queryable knowledge b
 
       <div class="fr-banner" role="status">
         <span class="fr-banner-icon" aria-hidden="true">◈</span>
-        <p class="fr-banner-text" id="fr-banner-copy"><strong>Synthetic workspace only.</strong> These 10 Slack threads are fabricated, but harvesting, confidence scoring, and the MCP preview use the same backend code as a real upload. <em>No real Slack data, no live API calls.</em></p>
+        <p class="fr-banner-text" id="fr-banner-copy"><strong>Synthetic workspace only.</strong> These 10 Slack threads are fabricated. Harvesting and confidence scoring use the same backend code as a real upload; the side panel is an <strong>MCP-contract simulation</strong>, not a live MCP server. <em>No real Slack data, no live API calls, no MCP transport.</em></p>
       </div>
 
       <GuidedTour {...GUIDED_TOURS.forager} />
 
-      <!-- Hero: foreground the RAG→MCP knowledge-server angle above the fold -->
+      <!-- Hero: knowledge harvest + honest MCP-contract simulation above the fold -->
       <section class="fr-hero" aria-label="What Forager does">
         <div class="fr-hero-lead">
           <h1 class="fr-hero-title">Your tribal knowledge is trapped in Slack threads.</h1>
-          <p class="fr-hero-sub">Forager harvests the resolved Q&amp;A out of Slack, scores each answer's confidence, and serves it as an <strong>MCP server your agents can query directly</strong> — not another wiki nobody updates.</p>
+          <p class="fr-hero-sub">Forager harvests the resolved Q&amp;A out of Slack, scores each answer's confidence, and shows the result in an <strong>MCP-style tool-contract panel</strong> so reviewers can inspect the response shape agents would see — not another wiki nobody updates. This is a simulation of the contract, not a live MCP server.</p>
         </div>
-        <div class="fr-hero-flow" aria-label="Pipeline: Slack export to MCP server">
+        <div class="fr-hero-flow" aria-label="Pipeline: Slack export to MCP-contract simulation">
           <span class="fr-hero-step">Slack export</span>
           <span class="fr-hero-arrow" aria-hidden="true">→</span>
           <span class="fr-hero-step">Q&amp;A extraction</span>
           <span class="fr-hero-arrow" aria-hidden="true">→</span>
-          <span class="fr-hero-step fr-hero-step-accent">MCP&nbsp;server</span>
+          <span class="fr-hero-step fr-hero-step-accent">MCP&nbsp;simulation</span>
         </div>
       </section>
 
@@ -112,13 +112,13 @@ const description = "Harvest resolved Slack threads into a queryable knowledge b
           </section>
         </main>
 
-        <aside class="fr-mcp" aria-label="MCP server panel">
+        <aside class="fr-mcp" aria-label="MCP contract simulation panel">
           <div class="fr-mcp-header">
-            <span class="fr-mcp-title">MCP Server</span>
+            <span class="fr-mcp-title">MCP contract (simulated)</span>
           </div>
           <div class="fr-mcp-panel" id="fr-mcp-panel">
             <div class="fr-mcp-placeholder">
-              Query the knowledge base to see the MCP response format.
+              Query the knowledge base to preview the simulated MCP response shape.
             </div>
           </div>
         </aside>

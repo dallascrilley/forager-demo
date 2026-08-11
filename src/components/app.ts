@@ -63,7 +63,7 @@ function updateModeBadge(state: KnowledgeState): void {
     banner.innerHTML =
       state.source === 'uploaded'
         ? '<strong>Uploaded workspace loaded.</strong> This session is now running against your own exported Slack data through a backend import endpoint. <em>No live Slack OAuth, but the threads and extracted answers are real.</em>'
-        : '<strong>Synthetic workspace only.</strong> These 10 Slack threads are fabricated, but harvesting, confidence scoring, and the MCP preview use the same backend code as a real upload. <em>No real Slack data, no live API calls.</em>';
+        : '<strong>Synthetic workspace only.</strong> These 10 Slack threads are fabricated. Harvesting and confidence scoring use the same backend code as a real upload; the side panel is an <strong>MCP-contract simulation</strong>, not a live MCP server. <em>No real Slack data, no live API calls, no MCP transport.</em>';
   }
   if (sourceTitle) sourceTitle.textContent = state.sourceLabel;
   if (sourceDetail) sourceDetail.textContent = state.sourceDetail;
@@ -213,7 +213,7 @@ function renderMCPResponse(results: QAEntry[], query: string): void {
 
   panel.innerHTML = `
     <div class="fr-mcp-header">
-      <span class="fr-mcp-label">MCP Server Response</span>
+      <span class="fr-mcp-label">MCP response shape (simulated)</span>
       <span class="fr-mcp-method">tools/knowledge_query</span>
     </div>
     <div class="fr-mcp-request">
