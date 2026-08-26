@@ -1,0 +1,9 @@
+allowBuilds:
+  esbuild: set this to true or false
+  sharp: set this to true or false
+# pnpm 11 reads settings from this file, not from package.json.
+#
+# pnpm 11 turns unapproved dependency build scripts into a hard install error.
+# These scripts already did not run under pnpm 10, which only warned; false
+# keeps that behavior rather than newly granting them execution.
+strictDepBuilds: false
